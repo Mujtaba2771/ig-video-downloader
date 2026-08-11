@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>IG Video Downloader</title>
+
+  <meta name="description"
+        content="Download Instagram videos you own or are authorized to access.">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #fff0f6, #f2edff, #edf8ff);
+      color: #171717;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 60px 18px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 28px;
+      padding: 40px;
+      box-shadow: 0 20px 70px rgba(0,0,0,0.08);
+    }
+
+    .brand {
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .brand span {
+      background: linear-gradient(90deg,#e1306c,#833ab4);
+      color: transparent;
+      background-clip: text;
+    }
+
+    h1 {
+      font-size: clamp(40px,7vw,70px);
+      line-height: .96;
+      letter-spacing: -3px;
+      margin: 55px 0 18px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .form {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .form input {
+      flex: 1;
+      padding: 18px;
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .form input:focus {
+      border-color: #833ab4;
+    }
+
+    .form button {
+      border: 0;
+      border-radius: 14px;
+      padding: 0 25px;
+      background: #171717;
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .form button:hover {
+      opacity: .9;
+    }
+
+    .message {
+      display: none;
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 12px;
+      background: #f3f3f3;
+      color: #444;
+    }
+
+    .result {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 18px;
+      background: #fafafa;
+    }
+
+    .result img {
+      max-width: 240px;
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .download {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 13px 20px;
+      background: #171717;
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 12px;
+      margin-top: 35px;
+    }
+
+    .step {
+      padding: 20px;
+      background: #fafafa;
+      border-radius: 16px;
+    }
+
+    .step b {
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    .step span {
+      color: #777;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .note {
+      margin-top: 28px;
+      color: #888;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    @media(max-width:650px) {
+
+      .container {
+        padding: 25px 14px;
+      }
+
+      .card {
+        padding: 25px 18px;
+      }
+
+      .form {
+        flex-direction: column;
+      }
+
+      .form button {
+        height: 54px;
+      }
+
+      .steps {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        letter-spacing: -2px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="card">
+
+    <div class="brand">
+      IG <span>Video Downloader</span>
+    </div>
+
+    <h1>
+      Save your videos.
+    </h1>
+
+    <p class="subtitle">
+      Enter an authorized Instagram media ID to find and download
+      your Instagram video.
+    </p>
+
+    <div class="form">
+
+      <input
+        id="mediaId"
+        type="text"
+        placeholder="Enter Instagram Media ID"
+        autocomplete="off"
+      >
+
+      <button id="downloadBtn">
+        Find Video
+      </button>
+
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <div id="result" class="result"></div>
+
+    <div class="steps">
+
+      <div class="step">
+        <b>1. Get Media ID</b>
+        <span>
+          Use an authorized Instagram/Meta API account.
+        </span>
+      </div>
+
+      <div class="step">
+        <b>2. Enter ID</b>
+        <span>
+          Paste the media ID into the box above.
+        </span>
+      </div>
+
+      <div class="step">
+        <b>3. Download</b>
+        <span>
+          Download the authorized video.
+        </span>
+      </div>
+
+    </div>
+
+    <div class="note">
+      Only download content you own or have permission to save.
+      Your API access token stays on the server and is never exposed
+      in this page.
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const button = document.getElementById("downloadBtn");
+
+const input = document.getElementById("mediaId");
+
+const message = document.getElementById("message");
+
+const result = document.getElementById("result");
+
+
+function showMessage(text) {
+
+  message.style.display = "block";
+
+  message.textContent = text;
+
+}
+
+
+button.addEventListener("click", async function() {
+
+  const mediaId = input.value.trim();
+
+  result.style.display = "none";
+
+  result.innerHTML = "";
+
+  if (!mediaId) {
+
+    showMessage("Please enter an Instagram Media ID.");
+
+    return;
+
+  }
+
+  showMessage("Checking video...");
+
+  button.disabled = true;
+
+  button.textContent = "Loading...";
+
+
+  try {
+
+    const response = await fetch("/api/resolve", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        url: mediaId
+      })
+
+    });
+
+
+    const data = await response.json();
+
+
+    if (!response.ok || !data.ok) {
+
+      throw new Error(
+        data.error || "Unable to find the video."
+      );
+
+    }
+
+
+    message.style.display = "none";
+
+    result.style.display = "block";
+
+
+    let html = "";
+
+
+    if (data.media.thumbnailUrl) {
+
+      html += `
+        <img
+          src="${data.media.thumbnailUrl}"
+          alt="Video thumbnail"
+        >
+      `;
+
+    }
+
+
+    html += `
+      <p>
+        <strong>Media type:</strong>
+        ${data.media.type}
+      </p>
+    `;
+
+
+    if (data.media.mediaUrl) {
+
+      html += `
+        <a
+          class="download"
+          href="/api/download?id=${encodeURIComponent(data.media.id)}"
+        >
+          Download Video
+        </a>
+      `;
+
+    }
+
+
+    result.innerHTML = html;
+
+
+  } catch (error) {
+
+    showMessage(error.message);
+
+  } finally {
+
+    button.disabled = false;
+
+    button.textContent = "Find Video";
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
